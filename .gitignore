@@ -1,0 +1,17 @@
+/.phpunit.cache
+/.phpunit.result.cache
+/node_modules
+/vendor
+/public/build
+/public/hot
+/storage/*.key
+/storage/app/private/*
+/storage/framework/cache/data/*
+/storage/framework/views/*
+/storage/framework/sessions/*
+/storage/logs/*
+/bootstrap/cache/*.php
+/database/*.sqlite
+.env
+.env.*
+!.env.example
