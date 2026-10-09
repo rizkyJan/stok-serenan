@@ -27,7 +27,10 @@
                 const percent = value(row.querySelector('[data-line-percent]'));
                 const extraDiscount = value(row.querySelector('[data-line-discount]'));
                 const lineGross = Math.round(qty * cost * 100) / 100;
-                const lineDiscount = Math.round((Math.round(lineGross * percent / 100 * 100) / 100 + extraDiscount) * 100) / 100;
+                const percentAmount = Math.round(lineGross * percent / 100 * 100) / 100;
+                const lineDiscount = Math.round((percentAmount + extraDiscount) * 100) / 100;
+                const percentValue = row.querySelector('[data-percent-discount]');
+                if (percentValue) percentValue.textContent = currency(percentAmount);
                 const rowInvalid = lineDiscount > lineGross || percent > 100;
                 invalid = invalid || rowInvalid;
                 gross += lineGross;
@@ -73,11 +76,44 @@
             const taxRate = document.getElementById('taxRate');
             if (manualTax) manualTax.readOnly = mode !== 'manual';
             if (taxRate) taxRate.readOnly = (mode === 'none' || mode === 'manual');
-            const submit = root.querySelector('button[type="submit"]');
+            const submit = root.querySelector('[data-final-submit]');
             if (submit) {
                 submit.disabled = invalid || !matchesDocument || dpp < 0 || total < 0 || !Number.isFinite(total) || container.querySelectorAll('[data-item-row]').length < 1;
             }
         };
+        const discountMode = document.getElementById('discountMode');
+        const taxEnabled = document.getElementById('taxEnabled');
+        const taxMode = document.getElementById('taxMode');
+        const paymentMode = document.getElementById('paymentMode');
+        let lastTaxMode = taxMode?.value === 'none' ? 'manual' : (taxMode?.value || 'manual');
+        const syncSettings = () => {
+            if (discountMode) {
+                const mode = discountMode.value;
+                root.querySelectorAll('[data-line-percent], [data-line-discount]').forEach(el => {
+                    if (mode === 'none' || mode === 'invoice') {el.value = 0; el.readOnly = true;}
+                    else el.readOnly = false;
+                });
+                const invDiscount = root.querySelector('[name="discount"]');
+                if (invDiscount) { if (mode === 'none' || mode === 'per_item') invDiscount.value = 0;
+                    invDiscount.readOnly = mode === 'none' || mode === 'per_item'; }
+            }
+            if (taxEnabled && taxMode) {
+                if (taxEnabled.value === 'off') {if (taxMode.value !== 'none') lastTaxMode=taxMode.value;taxMode.value='none';taxMode.disabled=true;
+                  const duplicate = document.getElementById('taxModeSubmission');
+                  if(duplicate) {duplicate.value='none';duplicate.disabled=false;} }
+                else {taxMode.disabled=false;if(taxMode.value==='none')taxMode.value=lastTaxMode;const duplicate=document.getElementById('taxModeSubmission');if(duplicate) {duplicate.value='';duplicate.disabled=true;}}
+            }
+            const isPaid = paymentMode?.value === 'lunas';
+            root.querySelectorAll('[data-paid-fields]').forEach(el => {
+                el.disabled = !isPaid;
+                if (el.name !== 'payment_description') el.required = isPaid;
+            });
+            recalculate();
+        };
+        discountMode?.addEventListener('change',syncSettings);
+        paymentMode?.addEventListener('change',syncSettings);
+        taxMode?.addEventListener('change', () => {if(taxMode.value!=='none')lastTaxMode=taxMode.value;recalculate();});
+        taxEnabled?.addEventListener('change',syncSettings);
         document.getElementById('addItem')?.addEventListener('click', () => {
             if (container.querySelectorAll('[data-item-row]').length >= 50) { alert('Maksimal 50 barang per faktur.'); return; }
             const fragment = template.content.cloneNode(true);
@@ -85,7 +121,7 @@
             fragment.querySelector('[data-row-index]').dataset.rowIndex = String(nextIndex);
             nextIndex += 1;
             container.appendChild(fragment);
-            recalculate();
+            syncSettings();
         });
         root.addEventListener('input', recalculate);
         root.addEventListener('change', recalculate);
@@ -97,7 +133,8 @@
             }
         });
         if (!container.querySelector('[data-item-row]')) document.getElementById('addItem')?.click();
-        recalculate();
+        if(taxEnabled && taxMode && taxMode.value==='none') taxEnabled.value='off';
+        syncSettings();
     }
     const outProduct = document.getElementById('outProduct');
     const outQty = document.getElementById('outQuantity');

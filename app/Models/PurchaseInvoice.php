@@ -4,8 +4,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class PurchaseInvoice extends Model {
-    protected $fillable=['supplier_id','invoice_no','invoice_date','received_date','due_date','subtotal','line_discount_total','net_items_total','discount','dpp','other_dpp','tax_mode','tax_rate','tax','shipping','total','paid_amount','notes','recipient_name','document_total','attachment_path','attachment_filename','attachment_mime','created_by'];
-    protected function casts():array{return ['invoice_date'=>'date','received_date'=>'date','due_date'=>'date'];}
+    protected $fillable=['supplier_id','invoice_no','invoice_date','received_date','due_date','subtotal','line_discount_total','net_items_total','discount','dpp','other_dpp','tax_mode','tax_rate','tax','shipping','total','paid_amount','notes','recipient_name','document_total','attachment_path','attachment_filename','attachment_mime','created_by','discount_mode','settlement_date'];
+    protected function casts():array{return ['invoice_date'=>'date','received_date'=>'date','due_date'=>'date','settlement_date'=>'date'];}
     public function supplier():BelongsTo{return $this->belongsTo(Supplier::class);}
     public function items():HasMany{return $this->hasMany(PurchaseItem::class);}
     public function payments():HasMany{return $this->hasMany(SupplierPayment::class);}

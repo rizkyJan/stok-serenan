@@ -18,3 +18,5 @@
 @media(max-width:640px){.invoice-line-summary{display:grid;gap:5px}.invoice-breakdown{padding:12px}}
 
 .doc-mismatch{background:#fff0ed;border-left-color:#d66c52;color:#a44639}
+
+.readout{display:block;border:1px solid #dbe7e3;background:#eff7f3;border-radius:9px;padding:12px;font-weight:750;color:#107957;margin-top:5px}

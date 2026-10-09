@@ -28,7 +28,10 @@ class PaymentController extends Controller {
                 throw ValidationException::withMessages(['amount'=>'Nominal pembayaran harus lebih dari nol dan tidak melebihi sisa tagihan.']);
             }
             SupplierPayment::create($data+['purchase_invoice_id'=>$locked->id,'created_by'=>auth()->id(),'amount'=>$amount]);
-            $locked->update(['paid_amount'=>round((float)$locked->paid_amount+$amount,2)]);
+             $newPaid = round((float)$locked->paid_amount+$amount,2);
+            $fields = ['paid_amount'=>$newPaid];
+            if ($newPaid >= (float)$locked->total-0.009) $fields['settlement_date'] = $data['paid_at'];
+            $locked->update($fields);
         },3);
         return redirect()->route('purchases.show',$invoice)->with('success','Pembayaran berhasil dicatat.');
     }

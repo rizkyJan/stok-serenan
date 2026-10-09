@@ -41,7 +41,7 @@
             @if(session('success'))<div class="alert success" role="status"><span>✓</span> {{session('success')}}</div>@endif
             @if($errors->any())<div class="alert error" role="alert"><strong>Periksa isian berikut:</strong><ul>@foreach($errors->all() as $error)<li>{{$error}}</li>@endforeach</ul></div>@endif
             @yield('content')
-            <footer class="footer">© {{date('Y')}} Apotek Serenan · Sistem Pencatatan Stok <span>Versi 1.1 · Faktur PBF</span></footer>
+            <footer class="footer">© {{date('Y')}} Apotek Serenan · Sistem Pencatatan Stok <span>Versi 1.2 · Penerimaan Barang</span></footer>
         </main>
     </div>
 </div>

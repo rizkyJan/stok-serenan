@@ -16,6 +16,8 @@
     <div><span>Jatuh Tempo</span><strong>{{$invoice->due_date->format('d/m/Y')}}</strong></div>
     <div><span>Penerima</span><strong>{{$invoice->recipient_name ?: 'Apotek Serenan'}}</strong></div>
     <div><span>Petugas</span><strong>{{$invoice->creator->name}}</strong></div>
+    <div><span>Jenis Diskon</span><strong>{{['none'=>'Tanpa Diskon','invoice'=>'Keseluruhan','per_item'=>'Per Item','combined'=>'Kombinasi / Faktur Lama'][$invoice->discount_mode] ?? '—'}}</strong></div>
+    @if($invoice->settlement_date)<div><span>Tanggal Pelunasan</span><strong>{{$invoice->settlement_date->format('d/m/Y')}}</strong></div>@endif
     <div><span>Total Faktur Asli</span><strong>{{$invoice->document_total !== null ? 'Rp '.number_format($invoice->document_total,2,',','.') : 'Belum diinput'}}</strong></div>
     <div><span>Perhitungan PPN</span><strong>{{['manual'=>'Nominal sesuai faktur', 'none'=>'Tanpa PPN', 'standard'=>'DPP × tarif', 'nilai_lain'=>'DPP nilai lain 11/12 × tarif'][$invoice->tax_mode]??'Manual / data lama'}}</strong></div>
   </div>
@@ -36,14 +38,14 @@
   </div></section>
 </div>
 <section class="panel"><div class="panel-title"><div><h2>Daftar Barang Sesuai Faktur PBF</h2><p>Harga, diskon, batch/ED, konversi stok, dan jumlah netto</p></div></div>
-  <div class="table-scroll"><table><thead><tr><th>Barang</th><th>ZB</th><th>Batch</th><th>ED</th><th>Qty</th><th>Masuk Stok</th><th>Harga/Kemasan</th><th>Bruto</th><th>Diskon %</th><th>Total Potongan</th><th>Netto</th></tr></thead><tbody>
+  <div class="table-scroll"><table><thead><tr><th>Barang</th><th>ZB</th><th>Batch</th><th>ED</th><th>Qty</th><th>Masuk Stok</th><th>Harga/Kemasan</th><th>Bruto</th><th>Diskon %</th><th>Total Potongan</th><th>Netto</th><th>Harga Jual/Satuan</th></tr></thead><tbody>
     @foreach($invoice->items as $item)
       <tr><td><span class="code-tag">{{$item->product->sku}}</span><small class="block-muted">{{$item->product->name}}</small></td>
       <td>{{$item->zb_code ?? '—'}}</td><td>{{$item->batch->batch_number}}</td><td>{{$item->batch->expires_at?->format('d/m/Y') ?? '—'}}</td>
       <td>{{$item->purchase_quantity}} {{$item->purchase_unit}}</td><td>{{$item->quantity_base}} {{$item->product->unit}}</td>
       <td class="nowrap">Rp {{number_format($item->purchase_unit_cost,2,',','.')}}</td>
       <td class="nowrap">Rp {{number_format((float)$item->line_gross ?: ((float)$item->purchase_unit_cost*$item->purchase_quantity),2,',','.')}}</td>
-      <td>{{number_format($item->line_discount_percent,2,',','.')}}%</td><td class="nowrap">Rp {{number_format($item->line_discount_total,2,',','.')}}</td><td class="nowrap"><strong>Rp {{number_format($item->line_total,2,',','.')}}</strong></td></tr>
+      <td>{{number_format($item->line_discount_percent,2,',','.')}}%</td><td class="nowrap">Rp {{number_format($item->line_discount_total,2,',','.')}}</td><td class="nowrap"><strong>Rp {{number_format($item->line_total,2,',','.')}}</strong></td><td class="nowrap">{{$item->selling_unit_price === null ? '—' : 'Rp '.number_format($item->selling_unit_price,2,',','.')}}</td></tr>
     @endforeach
   </tbody></table></div>
 </section>

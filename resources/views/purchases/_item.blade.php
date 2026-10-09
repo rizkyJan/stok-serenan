@@ -16,8 +16,10 @@
     <label>Satuan Pembelian <span class="required">*</span><input name="items[{{ $index }}][purchase_unit]" value="{{ $item['purchase_unit'] ?? 'box' }}" required maxlength="50" placeholder="Box / strip / botol"></label>
     <label>Isi per Kemasan (satuan terkecil) <span class="required">*</span><input type="number" min="1" max="1000000" name="items[{{ $index }}][unit_multiplier]" value="{{ $item['unit_multiplier'] ?? 1 }}" required data-multiplier></label>
     <label>Harga Beli / Kemasan (Rp) <span class="required">*</span><input type="number" min="0" max="9999999999" step="0.01" name="items[{{ $index }}][purchase_unit_cost]" value="{{ $item['purchase_unit_cost'] ?? 0 }}" required data-cost></label>
+    <label>Harga Jual / Satuan Stok (Rp, opsional)<input type="number" min="0" max="9999999999" step="0.01" name="items[{{ $index }}][selling_unit_price]" value="{{ $item['selling_unit_price'] ?? '' }}" placeholder="Contoh: 1500 / tablet"></label>
     <label>Diskon Barang (%)<input type="number" min="0" max="100" step="0.001" name="items[{{ $index }}][line_discount_percent]" value="{{ $item['line_discount_percent'] ?? 0 }}" data-line-percent></label>
-    <label>Potongan Tambahan Barang (Rp)<input type="number" min="0" step="0.01" name="items[{{ $index }}][line_discount_amount]" value="{{ $item['line_discount_amount'] ?? 0 }}" data-line-discount placeholder="Di luar diskon persentase"></label>
+    <label>Nilai Potongan dari % (otomatis)<output data-percent-discount class="readout">Rp 0</output></label>
+    <label>Potongan Tambahan Khusus (Rp, opsional)<input type="number" min="0" step="0.01" name="items[{{ $index }}][line_discount_amount]" value="{{ $item['line_discount_amount'] ?? 0 }}" data-line-discount placeholder="Isi hanya jika memang ada potongan rupiah tambahan"></label>
   </div>
   <div class="item-summary invoice-line-summary">
     <span>Penambahan stok: <strong data-base-qty>0</strong> satuan terkecil</span>

@@ -25,6 +25,9 @@ Route::middleware(['auth', EnsureActiveUser::class])->group(function () {
     Route::resource('pbf', SupplierController::class)->parameters(['pbf'=>'supplier'])->except(['show','destroy'])->names('suppliers');
     Route::get('/barang-masuk', [PurchaseController::class,'index'])->name('purchases.index');
     Route::get('/barang-masuk/tambah', [PurchaseController::class,'create'])->name('purchases.create');
+    Route::post('/barang-masuk/draft', [PurchaseController::class,'saveDraft'])->name('purchases.draft.store');
+    Route::get('/barang-masuk/draft/{draft}/edit', [PurchaseController::class,'editDraft'])->name('purchases.draft.edit');
+    Route::delete('/barang-masuk/draft/{draft}', [PurchaseController::class,'deleteDraft'])->name('purchases.draft.delete');
     Route::post('/barang-masuk', [PurchaseController::class,'store'])->name('purchases.store');
     Route::get('/barang-masuk/{invoice}', [PurchaseController::class,'show'])->name('purchases.show');
     Route::get('/barang-masuk/{invoice}/cetak', [PurchaseController::class,'print'])->name('purchases.print');
