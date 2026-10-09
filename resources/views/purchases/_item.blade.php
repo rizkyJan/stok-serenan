@@ -13,10 +13,26 @@
     <label>ED / Kedaluwarsa<input type="date" name="items[{{ $index }}][expires_at]" value="{{ $item['expires_at'] ?? '' }}"></label>
     <label>Kode ZB (opsional)<input name="items[{{ $index }}][zb_code]" maxlength="30" value="{{ $item['zb_code'] ?? '' }}" placeholder="Sesuai kolom faktur PBF"></label>
     <label>Qty / Jumlah Kemasan <span class="required">*</span><input type="number" min="1" max="1000000" name="items[{{ $index }}][purchase_quantity]" value="{{ $item['purchase_quantity'] ?? 1 }}" required data-quantity></label>
-    <label>Satuan Pembelian <span class="required">*</span><input name="items[{{ $index }}][purchase_unit]" value="{{ $item['purchase_unit'] ?? 'box' }}" required maxlength="50" placeholder="Box / strip / botol"></label>
+    <label>Satuan Pembelian <span class="required">*</span>
+      <select name="items[{{ $index }}][purchase_unit]" required data-purchase-unit-select>
+        <option value="">Pilih satuan pembelian</option>
+        @foreach($purchaseUnits as $unit)
+          <option value="{{ $unit->name }}" @selected(($item['purchase_unit'] ?? 'box') === $unit->name)>{{ $unit->name }}</option>
+        @endforeach
+        @if(!empty($item['purchase_unit']) && !$purchaseUnits->contains('name',$item['purchase_unit']))
+          <option value="{{ $item['purchase_unit'] }}" selected>{{ $item['purchase_unit'] }} (draft lama - daftarkan dulu)</option>
+        @endif
+      </select>
+      <span class="unit-add-control"><button type="button" class="text-link" data-show-new-unit>＋ Data belum ada? Tambahkan satuan</button></span>
+      <span class="new-unit-inline" data-new-unit-inline hidden>
+        <input type="text" maxlength="50" data-new-unit-name placeholder="Contoh: pcs / tablet / sachet" aria-label="Nama satuan baru">
+        <button type="button" class="btn btn-light" data-save-new-unit>Tambahkan</button>
+        <button type="button" class="btn btn-light" data-cancel-new-unit>Batal</button>
+        <small data-unit-feedback role="status"></small>
+      </span>
+    </label>
     <label>Isi per Kemasan (satuan terkecil) <span class="required">*</span><input type="number" min="1" max="1000000" name="items[{{ $index }}][unit_multiplier]" value="{{ $item['unit_multiplier'] ?? 1 }}" required data-multiplier></label>
     <label>Harga Beli / Kemasan (Rp) <span class="required">*</span><input type="number" min="0" max="9999999999" step="0.01" name="items[{{ $index }}][purchase_unit_cost]" value="{{ $item['purchase_unit_cost'] ?? 0 }}" required data-cost></label>
-    <label>Harga Jual / Satuan Stok (Rp, opsional)<input type="number" min="0" max="9999999999" step="0.01" name="items[{{ $index }}][selling_unit_price]" value="{{ $item['selling_unit_price'] ?? '' }}" placeholder="Contoh: 1500 / tablet"></label>
     <label>Diskon Barang (%)<input type="number" min="0" max="100" step="0.001" name="items[{{ $index }}][line_discount_percent]" value="{{ $item['line_discount_percent'] ?? 0 }}" data-line-percent></label>
     <label>Nilai Potongan dari % (otomatis)<output data-percent-discount class="readout">Rp 0</output></label>
     <label>Potongan Tambahan Khusus (Rp, opsional)<input type="number" min="0" step="0.01" name="items[{{ $index }}][line_discount_amount]" value="{{ $item['line_discount_amount'] ?? 0 }}" data-line-discount placeholder="Isi hanya jika memang ada potongan rupiah tambahan"></label>

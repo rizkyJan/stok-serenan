@@ -18,7 +18,8 @@ class ProductController extends Controller {
         return $request->validate([
             'sku'=>['required','string','max:60',Rule::unique('products','sku')->ignore($product?->id)],
             'name'=>'required|string|max:255','category'=>'nullable|string|max:255','unit'=>'required|string|max:50',
-            'minimum_stock'=>'required|integer|min:0|max:100000000','notes'=>'nullable|string|max:2000',
+            'minimum_stock'=>'required|integer|min:0|max:100000000',
+            'selling_price'=>'nullable|numeric|min:0|max:9999999999','notes'=>'nullable|string|max:2000',
             'is_active'=>'required|boolean',
         ]);
     }

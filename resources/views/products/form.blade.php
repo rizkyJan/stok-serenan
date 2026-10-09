@@ -7,6 +7,7 @@
 <label>Nama Barang <span class="required">*</span><input name="name" value="{{old('name',$product->name)}}" required placeholder="Contoh: Paracetamol 500 mg"></label>
 <label>Kategori<input name="category" value="{{old('category',$product->category)}}" placeholder="Obat, vitamin, alat kesehatan..."></label>
 <label>Satuan Dasar <span class="required">*</span><input name="unit" value="{{old('unit',$product->unit??'tablet')}}" required placeholder="tablet / strip / botol / pcs"></label>
+<label>Harga Jual per Satuan Dasar (Rp)<input name="selling_price" type="number" min="0" max="9999999999" step="0.01" value="{{old('selling_price',$product->selling_price)}}" placeholder="Contoh: 1500 untuk 1 tablet"><small class="input-description">Harga jual aktif untuk transaksi barang keluar (penjualan). Dapat diubah kapan saja tanpa mengubah harga beli faktur atau riwayat transaksi lama.</small></label>
 <label>Batas Minimum Stok <span class="required">*</span><input name="minimum_stock" type="number" min="0" value="{{old('minimum_stock',$product->minimum_stock??10)}}" required></label>
 <label>Status <select name="is_active"><option value="1" @selected(old('is_active',$product->exists?(int)$product->is_active:1)==1)>Aktif</option><option value="0" @selected(old('is_active',$product->exists?(int)$product->is_active:1)==0)>Nonaktif</option></select></label></div>
 <label>Catatan <textarea name="notes" rows="3">{{old('notes',$product->notes)}}</textarea></label>

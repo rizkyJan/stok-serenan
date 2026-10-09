@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Supplier, Product, PurchaseInvoice, PurchaseDraft, SupplierPayment, ProductBatch, StockMovement};
+use App\Models\{Supplier, Product, PurchaseInvoice, PurchaseDraft, SupplierPayment, ProductBatch, StockMovement, PurchaseUnit};
 use App\Services\InvoiceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +29,7 @@ class PurchaseController extends Controller
             'prefill' => [], 'draft' => null,
             'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(),
             'products' => Product::where('is_active', true)->orderBy('name')->get(),
+            'purchaseUnits' => PurchaseUnit::orderBy('name')->get(),
         ]);
     }
 
@@ -39,6 +40,7 @@ class PurchaseController extends Controller
             'draft' => $draft, 'prefill' => $draft->payload,
             'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(),
             'products' => Product::where('is_active', true)->orderBy('name')->get(),
+            'purchaseUnits' => PurchaseUnit::orderBy('name')->get(),
         ]);
     }
 
@@ -57,7 +59,7 @@ class PurchaseController extends Controller
             'payment_mode','payment_date','settlement_date','payment_method','payment_description'];
         $payload = $request->only($allowed);
         $itemKeys = ['product_id','purchase_quantity','unit_multiplier','purchase_unit','purchase_unit_cost',
-            'zb_code','line_discount_percent','line_discount_amount','batch_number','expires_at','selling_unit_price'];
+            'zb_code','line_discount_percent','line_discount_amount','batch_number','expires_at'];
         $payload['items'] = array_values(array_map(
             fn ($item) => array_intersect_key((array)$item, array_flip($itemKeys)),
             array_filter((array)$request->input('items', []), 'is_array')
@@ -108,9 +110,8 @@ class PurchaseController extends Controller
             'items.*.product_id' => ['required', Rule::exists('products', 'id')->where('is_active', true)],
             'items.*.purchase_quantity' => 'required|integer|min:1|max:1000000',
             'items.*.unit_multiplier' => 'required|integer|min:1|max:1000000',
-            'items.*.purchase_unit' => 'required|string|max:50',
+            'items.*.purchase_unit' => ['required', 'string', 'max:50', Rule::exists('purchase_units', 'name')],
             'items.*.purchase_unit_cost' => 'required|numeric|min:0|max:9999999999',
-            'items.*.selling_unit_price' => 'nullable|numeric|min:0|max:9999999999',
             'items.*.zb_code' => 'nullable|string|max:30',
             'items.*.line_discount_percent' => 'nullable|numeric|min:0|max:100',
             'items.*.line_discount_amount' => 'nullable|numeric|min:0|max:999999999999',
@@ -193,7 +194,6 @@ class PurchaseController extends Controller
                         'line_gross' => $line['gross'], 'line_discount_percent' => $line['percent'],
                         'line_discount_amount' => $line['additional'], 'line_discount_total' => $line['discount'],
                         'line_total' => $line['net'],
-                        'selling_unit_price' => $item['selling_unit_price'] ?? null,
                     ]);
                     StockMovement::create([
                         'product_id' => $item['product_id'], 'product_batch_id' => $batch->id,

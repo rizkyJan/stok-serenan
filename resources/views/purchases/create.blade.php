@@ -7,7 +7,7 @@
 @if($suppliers->isEmpty() || $products->isEmpty())
   <div class="alert error">Buat minimal satu <a class="text-link" href="{{route('suppliers.create')}}">PBF</a> dan <a class="text-link" href="{{route('products.create')}}">barang</a> sebelum mencatat penerimaan.</div>
 @endif
-<form method="post" enctype="multipart/form-data" action="{{route('purchases.store')}}" id="purchaseForm" class="form-stack" data-purchase-form>
+<form data-purchase-units-url="{{route('purchase-units.store')}}" method="post" enctype="multipart/form-data" action="{{route('purchases.store')}}" id="purchaseForm" class="form-stack" data-purchase-form>
 @csrf
 @if($draft)<input type="hidden" name="draft_id" value="{{$draft->id}}">@endif
 <section class="panel form-card">
@@ -23,7 +23,7 @@
   <label>Catatan Faktur<textarea name="notes" rows="2" placeholder="Nomor pesanan, keterangan penerimaan, dsb.">{{$fv('notes')}}</textarea></label>
 </section>
 <section class="panel form-card">
-  <div class="section-heading"><span class="section-index">02</span><div><h2>Rincian Barang & Potongan</h2><p>Setiap barang bisa punya harga, diskon, batch dan tanggal ED sendiri</p></div></div>
+  <div class="section-heading"><span class="section-index">02</span><div><h2>Rincian Barang & Potongan</h2><p>Harga beli mengikuti faktur PBF. Harga jual diatur terpisah pada menu Data Barang.</p></div></div>
   <div id="purchaseItems" class="item-container">
     @foreach(old('items', $prefill['items'] ?? []) as $index => $item)
       @include('purchases._item', ['item'=>$item, 'index'=>$index, 'displayIndex'=>$loop->iteration])

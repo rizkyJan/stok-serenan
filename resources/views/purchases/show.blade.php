@@ -38,7 +38,7 @@
   </div></section>
 </div>
 <section class="panel"><div class="panel-title"><div><h2>Daftar Barang Sesuai Faktur PBF</h2><p>Harga, diskon, batch/ED, konversi stok, dan jumlah netto</p></div></div>
-  <div class="table-scroll"><table><thead><tr><th>Barang</th><th>ZB</th><th>Batch</th><th>ED</th><th>Qty</th><th>Masuk Stok</th><th>Harga/Kemasan</th><th>Bruto</th><th>Diskon %</th><th>Total Potongan</th><th>Netto</th><th>Harga Jual/Satuan</th></tr></thead><tbody>
+  <div class="table-scroll"><table><thead><tr><th>Barang</th><th>ZB</th><th>Batch</th><th>ED</th><th>Qty</th><th>Masuk Stok</th><th>Harga/Kemasan</th><th>Bruto</th><th>Diskon %</th><th>Total Potongan</th><th>Netto</th><th>Harga Jual Arsip V3*</th></tr></thead><tbody>
     @foreach($invoice->items as $item)
       <tr><td><span class="code-tag">{{$item->product->sku}}</span><small class="block-muted">{{$item->product->name}}</small></td>
       <td>{{$item->zb_code ?? '—'}}</td><td>{{$item->batch->batch_number}}</td><td>{{$item->batch->expires_at?->format('d/m/Y') ?? '—'}}</td>
@@ -48,6 +48,7 @@
       <td>{{number_format($item->line_discount_percent,2,',','.')}}%</td><td class="nowrap">Rp {{number_format($item->line_discount_total,2,',','.')}}</td><td class="nowrap"><strong>Rp {{number_format($item->line_total,2,',','.')}}</strong></td><td class="nowrap">{{$item->selling_unit_price === null ? '—' : 'Rp '.number_format($item->selling_unit_price,2,',','.')}}</td></tr>
     @endforeach
   </tbody></table></div>
+  <p class="hint">*Harga jual arsip V3 hanya dokumentasi transaksi lama. Harga jual aktif sekarang diatur pada <a href="{{route('products.index')}}" class="text-link">Data Barang</a>.</p>
 </section>
 <div class="two-columns">
   <section class="panel"><div class="panel-title"><h2>Lampiran Faktur PBF Asli</h2></div>

@@ -16,7 +16,7 @@ it('menyimpan draft tanpa menambah stok dan tagihan', function () {
         ->and(ProductBatch::count())->toBe(0);
 });
 
-it('mencatat harga jual item dan langsung lunas saat finalisasi', function () {
+it('tidak mengambil harga jual dari item dan tetap bisa langsung lunas saat finalisasi', function () {
     $user = User::factory()->create(['role'=>'admin','is_active'=>true]);
     $supplier = Supplier::create(['name'=>'PBF Uji V3']);
     $product = Product::create(['sku'=>'V3-001','name'=>'Produk Uji V3','unit'=>'tablet']);
@@ -35,7 +35,7 @@ it('mencatat harga jual item dan langsung lunas saat finalisasi', function () {
     $invoice = PurchaseInvoice::firstOrFail();
     expect($invoice->payment_status)->toBe('Lunas')
         ->and((float)$invoice->paid_amount)->toBe(100000.0)
-        ->and((float)$invoice->items()->first()->selling_unit_price)->toBe(6500.0)
+        ->and($invoice->items()->first()->selling_unit_price)->toBeNull()
         ->and(SupplierPayment::count())->toBe(1)
         ->and((int)ProductBatch::sum('quantity_available'))->toBe(20);
 });

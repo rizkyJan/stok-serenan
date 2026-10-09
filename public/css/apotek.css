@@ -20,3 +20,12 @@
 .doc-mismatch{background:#fff0ed;border-left-color:#d66c52;color:#a44639}
 
 .readout{display:block;border:1px solid #dbe7e3;background:#eff7f3;border-radius:9px;padding:12px;font-weight:750;color:#107957;margin-top:5px}
+
+/* V4: tambahan satuan pembelian inline tanpa menu sidebar */
+.unit-add-control{display:block;margin-top:2px}
+.unit-add-control button{border:0;background:none;padding:3px 0;text-align:left;white-space:normal}
+.new-unit-inline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:5px}
+.new-unit-inline[hidden]{display:none!important}
+.new-unit-inline input{flex:1;min-width:145px}
+.new-unit-inline button{font-size:10px;padding:9px 10px}
+.new-unit-inline small{width:100%;color:#b64b3f}

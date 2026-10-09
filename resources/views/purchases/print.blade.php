@@ -29,7 +29,7 @@
     </div>
   </div>
   <table class="invoice-table">
-    <thead><tr><th>No.</th><th>ZB</th><th>Unit</th><th>Qty</th><th>Nama barang / produk</th><th>No. Batch</th><th>ED</th><th>Harga satuan</th><th>Pot. %</th><th>Potongan total</th><th>Jumlah netto</th><th>Harga Jual / U.Stok</th></tr></thead>
+    <thead><tr><th>No.</th><th>ZB</th><th>Unit</th><th>Qty</th><th>Nama barang / produk</th><th>No. Batch</th><th>ED</th><th>Harga satuan</th><th>Pot. %</th><th>Potongan total</th><th>Jumlah netto</th></tr></thead>
     <tbody>
     @foreach($invoice->items as $item)
       <tr>
@@ -40,7 +40,7 @@
         <td class="num">{{number_format($item->purchase_unit_cost,2,',','.')}}</td>
         <td class="num">{{number_format($item->line_discount_percent,2,',','.')}}%</td>
         <td class="num">{{number_format($item->line_discount_total,2,',','.')}}</td>
-        <td class="num"><strong>{{number_format($item->line_total,2,',','.')}}</strong></td><td class="num">{{$item->selling_unit_price===null ? '—' : number_format($item->selling_unit_price,2,',','.')}}</td>
+        <td class="num"><strong>{{number_format($item->line_total,2,',','.')}}</strong></td>
       </tr>
     @endforeach
     </tbody>

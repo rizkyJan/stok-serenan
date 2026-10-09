@@ -125,7 +125,54 @@
         });
         root.addEventListener('input', recalculate);
         root.addEventListener('change', recalculate);
-        root.addEventListener('click', e => {
+        root.addEventListener('click', async e => {
+            const row = e.target.closest('[data-item-row]');
+            if (row && e.target.closest('[data-show-new-unit]')) {
+                row.querySelector('[data-new-unit-inline]').hidden = false;
+                row.querySelector('[data-new-unit-name]').focus();
+                return;
+            }
+            if (row && e.target.closest('[data-cancel-new-unit]')) {
+                row.querySelector('[data-new-unit-inline]').hidden = true;
+                row.querySelector('[data-unit-feedback]').textContent = '';
+                return;
+            }
+            if (row && e.target.closest('[data-save-new-unit]')) {
+                const btn = row.querySelector('[data-save-new-unit]');
+                const input = row.querySelector('[data-new-unit-name]');
+                const feedback = row.querySelector('[data-unit-feedback]');
+                const name = input.value.trim().toLocaleLowerCase('id-ID');
+                if (!name || name.length > 50) {feedback.textContent = 'Nama satuan harus 1-50 karakter.';return;}
+                btn.disabled = true;
+                feedback.textContent = 'Menyimpan satuan...';
+                try {
+                    const response = await fetch(root.dataset.purchaseUnitsUrl, {
+                        method: 'POST', credentials: 'same-origin',
+                        headers: {'Content-Type':'application/json', 'Accept':'application/json',
+                            'X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]')?.content || ''},
+                        body: JSON.stringify({name}),
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data?.errors?.name?.[0] || data?.message || 'Satuan gagal disimpan.');
+                    // Perbarui baris aktif dan template agar baris baru pada faktur yang sama juga mendapat satuan ini.
+                    const dropdowns = [...document.querySelectorAll('[data-purchase-unit-select]'),
+                        ...template.content.querySelectorAll('[data-purchase-unit-select]')];
+                    dropdowns.forEach(select => {
+                        if (![...select.options].some(opt => opt.value === data.name)) {
+                            select.add(new Option(data.name, data.name));
+                        }
+                    });
+                    const select = row.querySelector('[data-purchase-unit-select]');
+                    select.value = data.name;
+                    select.dispatchEvent(new Event('change', {bubbles:true}));
+                    input.value = '';
+                    row.querySelector('[data-new-unit-inline]').hidden = true;
+                    feedback.textContent = '';
+                } catch (err) {
+                    feedback.textContent = err.message || 'Koneksi gagal. Coba lagi.';
+                } finally {btn.disabled = false;}
+                return;
+            }
             if (e.target.closest('[data-remove-item]')) {
                 if (container.querySelectorAll('[data-item-row]').length <= 1) { alert('Minimal satu barang dalam faktur.'); return; }
                 e.target.closest('[data-item-row]').remove();
@@ -144,6 +191,12 @@
             const stock = Math.max(0, Number(opt?.dataset.stock) || 0);
             const unit = opt?.dataset.unit || 'unit';
             const qty = Math.max(0, Number(outQty.value) || 0);
+            const rawPrice = opt?.dataset.price;
+            const price = rawPrice === undefined || rawPrice === '' ? null : Number(rawPrice);
+            const isSale = document.getElementById('outReason')?.value === 'penjualan';
+            document.getElementById('outUnitPrice').textContent = price === null ? 'Belum diatur' : currency(price);
+            document.getElementById('outPriceUnit').textContent = `per ${unit}`;
+            document.getElementById('outSaleTotal').textContent = !isSale ? '— (nonpenjualan)' : price === null ? 'Atur harga di Data Barang' : currency(Math.round(price * qty * 100) / 100);
             document.getElementById('currentStock').textContent = `${stock} ${unit}`;
             document.getElementById('outPreview').textContent = `${qty} ${unit}`;
             const remaining = document.getElementById('stockAfter');
@@ -151,6 +204,8 @@
             remaining.classList.toggle('negative', qty > stock);
         };
         outProduct.addEventListener('change', recalc);
-        outQty.addEventListener('input', recalc); recalc();
+        outQty.addEventListener('input', recalc);
+        document.getElementById('outReason')?.addEventListener('change', recalc);
+        recalc();
     }
 })();

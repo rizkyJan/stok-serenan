@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0d544e">
     <title>@yield('title','Dashboard') · Apotek Serenan</title>
     <link rel="stylesheet" href="{{ asset('css/apotek.css') }}">
@@ -41,7 +42,7 @@
             @if(session('success'))<div class="alert success" role="status"><span>✓</span> {{session('success')}}</div>@endif
             @if($errors->any())<div class="alert error" role="alert"><strong>Periksa isian berikut:</strong><ul>@foreach($errors->all() as $error)<li>{{$error}}</li>@endforeach</ul></div>@endif
             @yield('content')
-            <footer class="footer">© {{date('Y')}} Apotek Serenan · Sistem Pencatatan Stok <span>Versi 1.2 · Penerimaan Barang</span></footer>
+            <footer class="footer">© {{date('Y')}} Apotek Serenan · Sistem Pencatatan Stok <span>Versi 1.3 · Master Harga Jual & Satuan Dinamis</span></footer>
         </main>
     </div>
 </div>

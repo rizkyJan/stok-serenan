@@ -25,6 +25,12 @@ class StockOutController extends Controller {
             'recipient'=>'nullable|string|max:255','notes'=>'nullable|string|max:3000',
         ]);
         DB::transaction(function()use($data){
+            // Ambil harga AKTIF dari master barang, bukan dari purchase_items/faktur PBF.
+            // Product dilock agar harga snapshot konsisten dengan transaksi yang disimpan.
+            $product = Product::whereKey($data['product_id'])->where('is_active', true)->lockForUpdate()->firstOrFail();
+            if ($data['reason'] === 'penjualan' && $product->selling_price === null) {
+                throw ValidationException::withMessages(['product_id' => 'Harga jual belum diatur. Silakan isi harga jual di menu Data Barang terlebih dahulu.']);
+            }
             $qty=(int)$data['quantity'];
             // Urutan FEFO, batch tanpa masa kedaluwarsa dipakai terakhir.
             $batches=ProductBatch::where('product_id',$data['product_id'])
@@ -35,7 +41,16 @@ class StockOutController extends Controller {
             if($batches->sum('quantity_available')<$qty){
                 throw ValidationException::withMessages(['quantity'=>'Stok layak keluar tidak cukup. Periksa jumlah dan batch kedaluwarsa.']);
             }
-            $out=StockOut::create($data+['created_by'=>auth()->id()]);
+            $unitPrice = $product->selling_price === null ? null : (float) $product->selling_price;
+            $saleTotal = $data['reason'] === 'penjualan' ? round($qty * $unitPrice, 2) : null;
+            if ($saleTotal !== null && $saleTotal > 99999999999999.99) {
+                throw ValidationException::withMessages(['quantity' => 'Nilai penjualan melebihi batas sistem. Kurangi jumlah barang.']);
+            }
+            $out=StockOut::create($data+[
+                'selling_price_snapshot'=>$unitPrice,
+                'sale_total'=>$saleTotal,
+                'created_by'=>auth()->id(),
+            ]);
             foreach($batches as $batch){
                 if($qty===0)break;
                 $take=min($qty,$batch->quantity_available);

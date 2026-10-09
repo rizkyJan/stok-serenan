@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseUnitController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\StockOutController;
@@ -22,6 +23,7 @@ Route::middleware(['auth', EnsureActiveUser::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('barang', ProductController::class)->parameters(['barang'=>'product'])->except(['show','destroy'])->names('products');
+    Route::post('/satuan-pembelian', [PurchaseUnitController::class,'store'])->middleware('throttle:15,1')->name('purchase-units.store');
     Route::resource('pbf', SupplierController::class)->parameters(['pbf'=>'supplier'])->except(['show','destroy'])->names('suppliers');
     Route::get('/barang-masuk', [PurchaseController::class,'index'])->name('purchases.index');
     Route::get('/barang-masuk/tambah', [PurchaseController::class,'create'])->name('purchases.create');
